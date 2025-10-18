@@ -2,38 +2,36 @@
 #include <stdlib.h>
 #include "fila.h"
 
-int main()
-{
+int main() {
     Fila fil;
-    nova_fila (&fil,10);
+    newFila (&fil,10);
     
     int*  i;
 
-    i=(int*)malloc(sizeof(int));
-    *i=2;
-    guarde_na_fila (&fil,(ElementoDeFila)i);
-    i=NULL;
+    i = (int*)malloc(sizeof(int));
+    *i = 2;
+    putOnFila (&fil,(ElementoDeFila)i);
+    i = NULL;
 
-    i=(int*)malloc(sizeof(int));
-    *i=3;
-    guarde_na_fila (&fil,(ElementoDeFila)i);
-    i=NULL;
+    i = (int*)malloc(sizeof(int));
+    *i = 3;
+    putOnFila (&fil,(ElementoDeFila)i);
+    i = NULL;
 
-    i=(int*)malloc(sizeof(int));
+    i = (int*)malloc(sizeof(int));
     *i=5;
-    guarde_na_fila (&fil,(ElementoDeFila)i);
-    i=NULL;
+    putOnFila (&fil,(ElementoDeFila)i);
+    i = NULL;
 
-    while (!fila_vazia(fil))
-    {
-        recupere_da_fila(fil,(ElementoDeFila*)&i);
-        remova_elemento_da_fila(&fil);
+    while (!isFilaVazia(fil)) {
+        getFromFila(fil,(ElementoDeFila*)&i);
+        removeFromFila(&fil);
         printf("%d ",*i);
         free(i);
-        i=NULL;
+        i = NULL;
     }
 
-    free_fila(&fil);
+    freeFila(&fil);
 
     return 0;
 }
