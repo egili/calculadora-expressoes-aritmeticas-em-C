@@ -8,12 +8,12 @@ boolean removeGaps(char* str) {
     }
 
     char* tempPtr        = str;
-    boolean inNumber     = false;
-    boolean lastWasDigit = false;
+    boolean inNumber     = false; // pra validar se atualmente estamos lendo um número
+    boolean lastWasDigit = false; // pra validar se o último caractere lido foi um dígito
     
     while (*tempPtr != '\0') {
         if (*tempPtr == ' ') {
-            if (inNumber && isdigit(*(tempPtr + 1)) && *(tempPtr + 1) != '\0') {
+            if (inNumber && isdigit(*(tempPtr + 1)) && *(tempPtr + 1) != '\0') { // isDigit serve para validar se o caractere é um dígito decimal 0-9
                 return false;
             }
         } else if (isdigit(*tempPtr)) {
