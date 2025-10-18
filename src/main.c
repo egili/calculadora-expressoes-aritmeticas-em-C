@@ -6,7 +6,7 @@ int main() {
     Fila fil;
     newFila (&fil,10);
     
-    int*  i;
+    int* i;
 
     i = (int*)malloc(sizeof(int));
     *i = 2;
