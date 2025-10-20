@@ -1,0 +1,86 @@
+# Calculadora de Expressões Aritméticas em C usando Pilhas e Filas
+
+## Objetivo Geral
+Construir uma **calculadora de expressões aritméticas** em C utilizando TADs (Tipos Abstratos de Dados), especialmente **pilhas e filas**.
+
+---
+
+## Funcionamento da Calculadora
+
+### 1. Entrada da expressão (Notação infixa)
+O usuário digita uma expressão aritmética tradicional, por exemplo:
+
+10 + (2 * 3 - 4) ^ 2 / 4 + 6 * 2
+
+
+### 2. Remoção de espaços desnecessários
+Espaços que não estejam entre dígitos devem ser removidos. Se houver espaços entre dígitos, o programa deve emitir um erro.
+
+Exemplo após remoção:
+
+10+(23-4)^2/4+62
+
+### 3. Quebra da expressão em tokens
+Separar números, operadores e parênteses, armazenando-os em uma **fila de entrada**.
+
+Fila de entrada:
+
+10, +, (, 2, *, 3, -, 4, ), ^, 2, /, 4, +, 6, *, 2
+
+---
+
+## Conversão da expressão infixa para pós-fixa (RPN)
+
+### Estruturas necessárias:
+- Fila de entrada (tokens da expressão)
+- Pilha de operadores
+- Fila de saída (expressão pós-fixa)
+
+### Regras:
+- **Números:** vão direto para fila de saída.
+- **Parênteses abertos:** empilhados.
+- **Parênteses fechados:** desempilham operadores para a fila de saída até desempilhar o parêntese aberto correspondente.
+- **Operadores:** ao ler um operador, desempilhar da pilha operadores de maior ou igual precedência, conforme a tabela fornecida, antes de empilhar o novo operador.
+
+---
+
+## Tabela de precedência e desempilhamento
+
+A tabela usada indica com `T` (True) ou `F` (False) se o operador no topo da pilha deve ser desempilhado antes de empilhar o operador da entrada.
+
+**Exemplo:**
+- Topo da pilha: `*`, próximo operador: `+` → desempilha `*` antes de empilhar `+`.
+- Topo da pilha: `^`, próximo operador: `*` → não desempilha `^` (precedência maior e associatividade à direita).
+
+---
+
+## Avaliação da expressão pós-fixa
+
+Após converter para pós-fixa, usa-se uma pilha de resultados:
+
+- Para cada número: empilhar.
+- Para cada operador: desempilhar dois operandos, aplicar o operador, empilhar o resultado.
+- Ao final, a pilha terá um único valor, o resultado final.
+
+---
+
+## Tratamento de Erros
+- Expressões malformadas (ex.: parênteses sem correspondência)
+- Divisão por zero
+- Espaços incorretos entre dígitos
+
+---
+
+## Exemplo Completo
+
+Entrada:
+10 + (2 * 3 - 4) ^ 2 / 4 + 6 * 2
+
+Fila pós-fixa:
+10, 2, 3, *, 4, -, 2, ^, 4, /, +, 6, 2, *, +
+
+Resultado final:
+23
+
+
+
