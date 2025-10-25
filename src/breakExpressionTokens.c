@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 boolean tokenizar(const char* expressao, Fila* filaTokens) {
     int i = 0;
