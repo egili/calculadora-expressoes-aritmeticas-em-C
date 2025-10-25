@@ -43,12 +43,11 @@ boolean putOnPilha(Pilha* p, ElementoDePilha e) {
 }
 
 boolean getFromPilha(Pilha p, ElementoDePilha* e) {
-    if (p.qtd_atual == 0) {
+    if (p.qtd_atual == 0 || p.vetor == NULL) {
         return false;
     } 
 
     *e = p.vetor[p.qtd_atual - 1];
-    
     return true;
 }
 

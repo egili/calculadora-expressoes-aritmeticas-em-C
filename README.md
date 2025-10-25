@@ -2,12 +2,6 @@
 O propósito deste trabalho é, usando pilhas e filas, construir em C o programa de uma Calculadora de Expressões Aritméticas usando notação polonesa prefixa e pós-fixa
 O desenvolvimento baseia-se no algoritmo de pátio de manobras (Shunting yard)
 
-
-# Calculadora de Expressões Aritméticas em C usando Pilhas e Filas
-
-## Objetivo Geral
-Construir uma **calculadora de expressões aritméticas** em C utilizando TADs (Tipos Abstratos de Dados), especialmente **pilhas e filas**.
-
 ---
 
 ## Funcionamento da Calculadora

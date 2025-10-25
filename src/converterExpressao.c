@@ -8,15 +8,19 @@
 #include <stdio.h>
 
 static int getPrecedencia(char operador) {
+    
     if (operador == '^') {
         return 3;
-    } 
+    }
+    
     if (operador == '*' || operador == '/') {
         return 2;
-    } 
+    }
+
     if (operador == '+' || operador == '-') {
         return 1;
-    }
+    } 
+    
     return 0;
 }
 
@@ -35,56 +39,67 @@ boolean converterExpressao(Fila* filaEntrada, Fila* filaSaida) {
 
         switch (token->tipo) {
             case TOKEN_NUMERO:
-                if (!putOnFila(filaSaida, token)) { //* numeros vao direto para a fila de saída
+                if (!putOnFila(filaSaida, token)) {
                     sucesso = false;
                 }
                 break;
 
-            case TOKEN_OPERADOR: //* operadores processados conforme precedência e associatividade
+            case TOKEN_OPERADOR:
                 while (!isPilhaVazia(pilhaOperadores)) {
                     Token* topo;
-                    getFromPilha(pilhaOperadores, (ElementoDePilha*)&topo);
-                    
-                    if (topo->tipo == TOKEN_PARENTESE && topo->valor[0] == '(') { //* encontrou um parentese esquerdo
+                    if (!getFromPilha(pilhaOperadores, (ElementoDePilha*)&topo)) {
                         break;
                     }
                     
-                    if (topo->tipo == TOKEN_OPERADOR) { //* validar se deve desempilhar operadores com precedencia maior ou igual
+                    // Parar se encontrar parêntese esquerdo
+                    if (topo->tipo == TOKEN_PARENTESE && topo->valor[0] == '(') {
+                        break;
+                    }
+                    
+                    // Processar apenas operadores
+                    if (topo->tipo == TOKEN_OPERADOR) {
                         char operadorTopo = topo->valor[0];
                         char operadorAtual = token->valor[0];
                         
-                        int precedenciaTopo = getPrecedencia(operadorTopo); 
-                        int precedenciaAtual = getPrecedencia(operadorAtual); 
+                        int precedenciaTopo = getPrecedencia(operadorTopo);
+                        int precedenciaAtual = getPrecedencia(operadorAtual);
                         
+                        // CORREÇÃO CRÍTICA: Lógica de associatividade
                         boolean deveDesempilhar = (precedenciaTopo > precedenciaAtual) ||
-                                            (precedenciaTopo == precedenciaAtual && operadorAtual != '^'); 
+                                            (precedenciaTopo == precedenciaAtual && 
+                                            !operadorAtual == '^');
                         
-                        if (deveDesempilhar) { //* mover o operador do topo para a saída
+                        if (deveDesempilhar) {
                             putOnFila(filaSaida, topo);
                             removeFromPilha(&pilhaOperadores);
                         } else {
                             break;
                         }
+                    } else {
+                        break;
                     }
-                }                
-                if (!putOnPilha(&pilhaOperadores, token)) { //* empilha o operador atual
+                }
+                
+                if (!putOnPilha(&pilhaOperadores, token)) {
                     sucesso = false;
                 }
                 break;
 
             case TOKEN_PARENTESE:
-                if (token->valor[0] == '(') { //* achou parêntese esquerdo e ele vai para a pilha
+                if (token->valor[0] == '(') {
                     if (!putOnPilha(&pilhaOperadores, token)) {
                         sucesso = false;
                     }
-                } else { //* Parêntese direito: desempilha até encontrar o esquerdo correspondente
+                } else {
                     boolean encontrouParenteseAberto = false;
                     
                     while (!isPilhaVazia(pilhaOperadores)) {
                         Token* topo;
-                        getFromPilha(pilhaOperadores, (ElementoDePilha*)&topo);
+                        if (!getFromPilha(pilhaOperadores, (ElementoDePilha*)&topo)) {
+                            break;
+                        }
                         
-                        if (topo->tipo == TOKEN_PARENTESE && topo->valor[0] == '(') { //* Encontrou o parêntese esquerdo correspondente
+                        if (topo->tipo == TOKEN_PARENTESE && topo->valor[0] == '(') {
                             encontrouParenteseAberto = true;
                             removeFromPilha(&pilhaOperadores);
                             
@@ -94,13 +109,13 @@ boolean converterExpressao(Fila* filaEntrada, Fila* filaSaida) {
                             free(token);
                             token = NULL;
                             break;
-                        } else { //* Move operadores para a saída
+                        } else {
                             putOnFila(filaSaida, topo);
                             removeFromPilha(&pilhaOperadores);
                         }
                     }
                     
-                    if (!encontrouParenteseAberto) { // ! direito sem correspondente
+                    if (!encontrouParenteseAberto) {
                         sucesso = false;
                         if (token) {
                             free(token->valor);
@@ -114,33 +129,43 @@ boolean converterExpressao(Fila* filaEntrada, Fila* filaSaida) {
         if (!sucesso) break;
     }
 
-    //* Processa operadores restantes na pilha
+    // Processar operadores restantes na pilha
     while (sucesso && !isPilhaVazia(pilhaOperadores)) {
         Token* topo;
-        getFromPilha(pilhaOperadores, (ElementoDePilha*)&topo);
+        if (!getFromPilha(pilhaOperadores, (ElementoDePilha*)&topo)) {
+            break;
+        }
         
-        if (topo->tipo == TOKEN_PARENTESE && topo->valor[0] == '(') { //! parêntese esquerdo sem fechamento
+        if (topo->tipo == TOKEN_PARENTESE && topo->valor[0] == '(') {
             sucesso = false;
             free(topo->valor);
             free(topo);
-        } else { //* Move operador para a saída
+        } else {
             if (!putOnFila(filaSaida, topo)) {
                 sucesso = false;
                 free(topo->valor);
                 free(topo);
-            } else {
-                removeFromPilha(&pilhaOperadores);
             }
+            removeFromPilha(&pilhaOperadores);
         }
     }
 
-    if (!sucesso) { //* Libera tokens restantes na pilha
+    // Limpeza em caso de erro
+    if (!sucesso) {
         while (!isPilhaVazia(pilhaOperadores)) {
             Token* topo;
-            getFromPilha(pilhaOperadores, (ElementoDePilha*)&topo);
-            removeFromPilha(&pilhaOperadores);
-            free(topo->valor);
-            free(topo);
+            if (getFromPilha(pilhaOperadores, (ElementoDePilha*)&topo)) {
+                removeFromPilha(&pilhaOperadores);
+                free(topo->valor);
+                free(topo);
+            }
+        }
+        
+        // Limpar fila de entrada em caso de erro
+        while (getFromFila(*filaEntrada, (ElementoDeFila*)&token)) {
+            removeFromFila(filaEntrada);
+            free(token->valor);
+            free(token);
         }
     }
 
@@ -149,6 +174,8 @@ boolean converterExpressao(Fila* filaEntrada, Fila* filaSaida) {
 }
 
 void freeFilaTokens(Fila* fila) {
+    if (fila == NULL) return;
+    
     Token* token;
     while (getFromFila(*fila, (ElementoDeFila*)&token)) {
         removeFromFila(fila);
@@ -157,25 +184,21 @@ void freeFilaTokens(Fila* fila) {
     }
 }
 
+// NOVA IMPLEMENTAÇÃO - não modifica a fila original
 void printFilaTokens(Fila fila) {
-    Fila filaTemporaria;
-
-    if (!newFila(&filaTemporaria, fila.qtdAtual)) {
+    if (fila.qtdAtual == 0) {
+        printf("\n");
         return;
     }
+
+    unsigned int i = fila.inicio;
+    unsigned int count = 0;
     
-    Token* token;
-    while (getFromFila(fila, (ElementoDeFila*)&token)) {
-        removeFromFila(&fila);
+    while (count < fila.qtdAtual) {
+        Token* token = (Token*)fila.vetor[i];
         printf("%s ", token->valor);
-        putOnFila(&filaTemporaria, token);
+        i = (i + 1) % fila.capacidade;
+        count++;
     }
-    
-    while (getFromFila(filaTemporaria, (ElementoDeFila*)&token)) { //* restaura a fila original
-        removeFromFila(&filaTemporaria);
-        putOnFila(&fila, token);
-    }
-    
-    freeFila(&filaTemporaria);
     printf("\n");
 }
