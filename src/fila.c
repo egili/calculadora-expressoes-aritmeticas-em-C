@@ -1,8 +1,7 @@
 #include <stdlib.h>
 #include "fila.h"
 
-boolean newFila (Fila* f, unsigned int capacidade) {
-    
+boolean newFila(Fila* f, unsigned int capacidade) {
     if (capacidade <= 0) {
         return false;
     } 
@@ -22,26 +21,33 @@ boolean newFila (Fila* f, unsigned int capacidade) {
     return true;
 }
 
-boolean putOnFila (Fila* f, ElementoDeFila e) {
+boolean putOnFila(Fila* f, ElementoDeFila e) {
     if (f->qtdAtual == f->capacidade) {
         unsigned int novaCapacidade = f->capacidade * 2;
-        ElementoDeFila* novoVetor = (ElementoDeFila*) realloc(f->vetor, novaCapacidade * sizeof(ElementoDeFila));
-
+        ElementoDeFila* novoVetor = (ElementoDeFila*) malloc(novaCapacidade * sizeof(ElementoDeFila));
+        
         if (novoVetor == NULL) {
             return false;
         }
-        f->vetor = novoVetor;
 
-        if (f->final <= f->inicio) {
-            unsigned int elementosAteFim = f->capacidade - f->inicio;
-
-            for (unsigned int i = 0; i < elementosAteFim; i++) {
-                f->vetor[novaCapacidade - elementosAteFim + i] = f->vetor[f->inicio + i];
-            }
-
-            f->inicio = novaCapacidade - elementosAteFim;
+        unsigned int posicaoAntiga;
+        unsigned int posicaoNova = 0;
+        
+        for (posicaoAntiga = f->inicio; posicaoAntiga < f->capacidade; posicaoAntiga++) {
+            novoVetor[posicaoNova] = f->vetor[posicaoAntiga];
+            posicaoNova++;
         }
+        
+        for (posicaoAntiga = 0; posicaoAntiga < f->final; posicaoAntiga++) {
+            novoVetor[posicaoNova] = f->vetor[posicaoAntiga];
+            posicaoNova++;
+        }
+
+        free(f->vetor);
+        f->vetor = novoVetor;
         f->capacidade = novaCapacidade;
+        f->inicio = 0;
+        f->final = f->qtdAtual;
     }
 
     f->vetor[f->final] = e;
@@ -51,7 +57,7 @@ boolean putOnFila (Fila* f, ElementoDeFila e) {
     return true;
 }
 
-boolean getFromFila (Fila f, ElementoDeFila* e) {
+boolean getFromFila(Fila f, ElementoDeFila* e) {
     if (f.qtdAtual == 0) {
         return false;
     } 
@@ -61,7 +67,7 @@ boolean getFromFila (Fila f, ElementoDeFila* e) {
     return true;
 }
 
-boolean removeFromFila (Fila* f) {
+boolean removeFromFila(Fila* f) {
     if (f->qtdAtual == 0) {
         return false;
     } 
@@ -72,13 +78,18 @@ boolean removeFromFila (Fila* f) {
     if (f->qtdAtual <= f->capacidade/4 && f->capacidade > f->capacidadeInicial) {
         unsigned int novaCapacidade = f->capacidade / 2;
         ElementoDeFila* novoVetor = (ElementoDeFila*) malloc(novaCapacidade * sizeof(ElementoDeFila));
+        
         if (novoVetor == NULL) {
-            return true;
-        } 
+            return true; 
+        }
 
+        unsigned int posicaoAntiga; 
+        unsigned int posicaoNova = 0;
+        
         for (unsigned int i = 0; i < f->qtdAtual; i++) {
-            unsigned int pos = (f->inicio + i) % f->capacidade;
-            novoVetor[i] = f->vetor[pos];
+            posicaoAntiga = (f->inicio + i) % f->capacidade;
+            novoVetor[posicaoNova] = f->vetor[posicaoAntiga];
+            posicaoNova++;
         }
         
         free(f->vetor);
@@ -90,15 +101,15 @@ boolean removeFromFila (Fila* f) {
     return true;
 }
 
-boolean isFilaCheia (Fila f) {
+boolean isFilaCheia(Fila f) {
     return f.qtdAtual == f.capacidade;
 }
 
-boolean isFilaVazia (Fila f) {
+boolean isFilaVazia(Fila f) {
     return f.qtdAtual == 0;
 }
 
-boolean freeFila (Fila* f) {
+boolean freeFila(Fila* f) {
     if (f->vetor == NULL) {
         return false;
     }
