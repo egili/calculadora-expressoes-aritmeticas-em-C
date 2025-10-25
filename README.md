@@ -80,3 +80,34 @@ Fila pós-fixa:
 
 Resultado final:
 23
+
+
+
+
+
+<hr/>
+<h3>Desenvolvido por:</h3>
+
+<table>
+  <tr>
+        <td align="center">
+            <a href="https://github.com/egili">
+                <img src="https://avatars.githubusercontent.com/u/79612701?v=4" width="100px;" alt="egili"/>
+                <br>
+                <sub>
+                    <b>egili</b>
+                </sub>
+            </a>
+        </td>
+        <td align="center">
+            <a href="https://github.com/Rnchx">
+                <img src="https://avatars.githubusercontent.com/u/123501793?v=4" width="100px;" alt="Rnchx"/>
+                <br>
+                <sub>
+                    <b>Rnchx</b>
+                </sub>
+            </a>
+            <br>
+        </td>
+    </tr>
+</table>
