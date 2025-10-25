@@ -5,7 +5,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-
 boolean tokenizar(const char* expressao, Fila* filaTokens) {
     int i = 0;
     int tamanho = strlen(expressao);
