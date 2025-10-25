@@ -8,16 +8,16 @@ boolean removerEspacos(char* str) {
         return false;
     }
 
-    char* ponteiroTemporario           = str;
+    char* stringAuxiliar               = str;
     boolean isNumeroAtualmente         = false; 
     boolean ultimoCaracterLidoEhDigito = false; 
     
-    while (*ponteiroTemporario != '\0') {
-        if (*ponteiroTemporario == ' ') {
-            if (isNumeroAtualmente && isdigit(*(ponteiroTemporario + 1)) && *(ponteiroTemporario + 1) != '\0') { //* isDigit serve para validar se o caractere é um dígito decimal 0-9
+    while (*stringAuxiliar != '\0') {
+        if (*stringAuxiliar == ' ') {
+            if (isNumeroAtualmente && isdigit(*(stringAuxiliar + 1)) && *(stringAuxiliar + 1) != '\0') { //* isDigit serve para validar se o caractere é um dígito decimal 0-9
                 return false;
             }
-        } else if (isdigit(*ponteiroTemporario)) {
+        } else if (isdigit(*stringAuxiliar)) {
             if (!isNumeroAtualmente && ultimoCaracterLidoEhDigito) {
                 return false; 
             }
@@ -27,11 +27,11 @@ boolean removerEspacos(char* str) {
             isNumeroAtualmente = false;
             ultimoCaracterLidoEhDigito = false;
             
-            if (!strchr("+-*/().", *ponteiroTemporario)) {
+            if (!strchr("+-*/().", *stringAuxiliar)) {
                 return false; 
             }
         }
-        ponteiroTemporario++;
+        stringAuxiliar++;
     }
 
     char* ponteiroLeitura = str;
