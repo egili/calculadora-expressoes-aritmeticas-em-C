@@ -14,7 +14,7 @@ boolean removerEspacos(char* str) {
     
     while (*ponteiroTemporario != '\0') {
         if (*ponteiroTemporario == ' ') {
-            if (isNumeroAtualmente && isdigit(*(ponteiroTemporario + 1)) && *(ponteiroTemporario + 1) != '\0') { // isDigit serve para validar se o caractere é um dígito decimal 0-9
+            if (isNumeroAtualmente && isdigit(*(ponteiroTemporario + 1)) && *(ponteiroTemporario + 1) != '\0') { //* isDigit serve para validar se o caractere é um dígito decimal 0-9
                 return false;
             }
         } else if (isdigit(*ponteiroTemporario)) {

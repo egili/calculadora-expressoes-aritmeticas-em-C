@@ -51,12 +51,10 @@ boolean converterExpressao(Fila* filaEntrada, Fila* filaSaida) {
                         break;
                     }
                     
-                    // Parar se encontrar parêntese esquerdo
-                    if (topo->tipo == TOKEN_PARENTESE && topo->valor[0] == '(') {
+                    if (topo->tipo == TOKEN_PARENTESE && topo->valor[0] == '(') { //* para se encontrar parêntese esquerdo
                         break;
                     }
                     
-                    // Processar apenas operadores
                     if (topo->tipo == TOKEN_OPERADOR) {
                         char operadorTopo = topo->valor[0];
                         char operadorAtual = token->valor[0];
@@ -64,10 +62,7 @@ boolean converterExpressao(Fila* filaEntrada, Fila* filaSaida) {
                         int precedenciaTopo = getPrecedencia(operadorTopo);
                         int precedenciaAtual = getPrecedencia(operadorAtual);
                         
-                        // CORREÇÃO CRÍTICA: Lógica de associatividade
-                        boolean deveDesempilhar = (precedenciaTopo > precedenciaAtual) ||
-                                            (precedenciaTopo == precedenciaAtual && 
-                                            !operadorAtual == '^');
+                        boolean deveDesempilhar = (precedenciaTopo > precedenciaAtual) || (precedenciaTopo == precedenciaAtual && !operadorAtual == '^');
                         
                         if (deveDesempilhar) {
                             putOnFila(filaSaida, topo);
@@ -129,8 +124,7 @@ boolean converterExpressao(Fila* filaEntrada, Fila* filaSaida) {
         if (!sucesso) break;
     }
 
-    // Processar operadores restantes na pilha
-    while (sucesso && !isPilhaVazia(pilhaOperadores)) {
+    while (sucesso && !isPilhaVazia(pilhaOperadores)) { //* processa os operadores restantes na pilha
         Token* topo;
         if (!getFromPilha(pilhaOperadores, (ElementoDePilha*)&topo)) {
             break;
@@ -150,8 +144,7 @@ boolean converterExpressao(Fila* filaEntrada, Fila* filaSaida) {
         }
     }
 
-    // Limpeza em caso de erro
-    if (!sucesso) {
+    if (!sucesso) { //* limpar em caso de erro
         while (!isPilhaVazia(pilhaOperadores)) {
             Token* topo;
             if (getFromPilha(pilhaOperadores, (ElementoDePilha*)&topo)) {
@@ -161,7 +154,6 @@ boolean converterExpressao(Fila* filaEntrada, Fila* filaSaida) {
             }
         }
         
-        // Limpar fila de entrada em caso de erro
         while (getFromFila(*filaEntrada, (ElementoDeFila*)&token)) {
             removeFromFila(filaEntrada);
             free(token->valor);
@@ -184,7 +176,6 @@ void freeFilaTokens(Fila* fila) {
     }
 }
 
-// NOVA IMPLEMENTAÇÃO - não modifica a fila original
 void printFilaTokens(Fila fila) {
     if (fila.qtdAtual == 0) {
         printf("\n");
