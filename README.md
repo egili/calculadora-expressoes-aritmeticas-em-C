@@ -107,7 +107,6 @@ Resultado final:
                     <b>Rnchx</b>
                 </sub>
             </a>
-            <br>
         </td>
     </tr>
 </table>
