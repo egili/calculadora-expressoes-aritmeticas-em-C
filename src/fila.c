@@ -30,17 +30,9 @@ boolean putOnFila(Fila* f, ElementoDeFila e) {
             return false;
         }
 
-        unsigned int posicaoAntiga;
-        unsigned int posicaoNova = 0;
-        
-        for (posicaoAntiga = f->inicio; posicaoAntiga < f->capacidade; posicaoAntiga++) {
-            novoVetor[posicaoNova] = f->vetor[posicaoAntiga];
-            posicaoNova++;
-        }
-        
-        for (posicaoAntiga = 0; posicaoAntiga < f->final; posicaoAntiga++) {
-            novoVetor[posicaoNova] = f->vetor[posicaoAntiga];
-            posicaoNova++;
+        for (unsigned int i = 0; i < f->qtdAtual; i++) { // * copiar elementos na ordem correta
+            unsigned int pos = (f->inicio + i) % f->capacidade;
+            novoVetor[i] = f->vetor[pos];
         }
 
         free(f->vetor);
