@@ -7,7 +7,7 @@
 #include "pilha.h"
 #include "token.h"
 #include "calculatePostfix.h"
-#include "removeGaps.c"
+#include "removerEspacos.c"
 #include "breakExpressionTokens.c"
 #include "calculatePostfix.c"
 
@@ -240,7 +240,7 @@ int main() {
         printf("\nExpressão original: '%s'\n", expressao);
         
         // ETAPA 1: Remover espaços
-        if (!removeGaps(expressao)) {
+        if (!removerEspacos(expressao)) {
             printf("Erro: Expressão contém espaços entre dígitos ou caracteres inválidos\n");
             continue;
         }
@@ -268,7 +268,7 @@ int main() {
         }
         
         // ETAPA 4: Cálculo da expressão pós-fixa
-        double resultado = calculatePostfix(fila_posfixa);
+        double resultado = calcular_posfixa(fila_posfixa);
         
         // Exibir resultado
         printf("Resultado: %.2f\n\n", resultado);
