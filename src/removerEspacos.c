@@ -8,19 +8,17 @@ boolean removerEspacos(char* str) {
         return false;
     }
 
-    // Primeiro, verificar se há caracteres inválidos
     char* ponteiroLeitura = str;
     while (*ponteiroLeitura != '\0') {
         if (!isspace(*ponteiroLeitura) && 
             !isdigit(*ponteiroLeitura) && 
-            !strchr("+-*/().^", *ponteiroLeitura)) {
+            !strchr("+-*/().^", *ponteiroLeitura)) {  
             printf("Erro: Caractere inválido '%c'\n", *ponteiroLeitura);
             return false;
         }
         ponteiroLeitura++;
     }
 
-    // Verificar se há espaços entre dígitos
     ponteiroLeitura = str;
     boolean emNumero = false;
     boolean espacoEncontrado = false;
@@ -40,14 +38,12 @@ boolean removerEspacos(char* str) {
             }
         } 
         else {
-            // Operador ou parêntese
             emNumero = false;
             espacoEncontrado = false;
         }
         ponteiroLeitura++;
     }
 
-    // Agora remover os espaços
     ponteiroLeitura = str;
     char* ponteiroEscrita = str;
 
