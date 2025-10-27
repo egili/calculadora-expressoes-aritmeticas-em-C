@@ -13,7 +13,9 @@ double string_para_double(const char* str) {
 
 char* double_para_string(double valor) {
     char* str = (char*)malloc(32 * sizeof(char));
-    if (str == NULL) return NULL;
+    if (str == NULL){
+        return NULL;
+    } 
     
     snprintf(str, 32, "%.15g", valor);
     return str;
