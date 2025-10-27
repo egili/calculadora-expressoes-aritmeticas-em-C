@@ -11,7 +11,6 @@
 #include "breakExpressionTokens.c"
 #include "calculatePostfix.c"
 
-// Função para converter infixa para pós-fixa (usando a tabela do projeto)
 Fila* infixa_para_posfixa(Fila* fila_infixa) {
     Pilha pilha_operadores;
     Fila* fila_saida = (Fila*)malloc(sizeof(Fila));
@@ -21,46 +20,76 @@ Fila* infixa_para_posfixa(Fila* fila_infixa) {
         return NULL;
     }
 
-    // Tabela de precedência (conforme especificação do projeto)
+    int precedencia(char operador) {
+        switch (operador) {
+            case '^': return 4;
+            case '*': case '/': return 3;
+            case '+': case '-': return 2;
+            case '(': case ')': return 1;
+            default: return 0;
+        }
+    }
+
+    boolean e_operador(char c) {
+        return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
+    }
+
     boolean deve_desempilhar(char topo_pilha, char entrada) {
-        if (topo_pilha == '(') {
-            if (entrada == ')') return true;
-            return false;
+        int prec_topo = precedencia(topo_pilha);
+        int prec_entrada = precedencia(entrada);
+        
+        // Para associatividade da esquerda (+, -, *, /)
+        if (topo_pilha == '+' || topo_pilha == '-' || topo_pilha == '*' || topo_pilha == '/') {
+            return prec_topo >= prec_entrada;
         }
-        if (topo_pilha == '^') {
-            if (entrada == '^' || entrada == '*' || entrada == '/' || 
-                entrada == '+' || entrada == '-' || entrada == ')') return true;
-            return false;
+        // Para associatividade da direita (^)
+        else if (topo_pilha == '^') {
+            return prec_topo > prec_entrada;
         }
-        if (topo_pilha == '*' || topo_pilha == '/') {
-            if (entrada == '*' || entrada == '/' || entrada == '+' || 
-                entrada == '-' || entrada == ')') return true;
-            return false;
-        }
-        if (topo_pilha == '+' || topo_pilha == '-') {
-            if (entrada == '+' || entrada == '-' || entrada == ')') return true;
-            return false;
-        }
+        
         return false;
     }
 
+    // Fila temporária para preservar a fila original
+    Fila fila_temp;
+    if (!newFila(&fila_temp, 10)) {
+        printf("Erro: Não foi possível criar fila temporária\n");
+        freePilha(&pilha_operadores);
+        freeFila(fila_saida);
+        free(fila_saida);
+        return NULL;
+    }
+
+    // Transferir todos os tokens para fila temporária
     while (!isFilaVazia(*fila_infixa)) {
         Token* token;
         if (!getFromFila(*fila_infixa, (ElementoDeFila*)&token)) {
-            printf("Erro ao obter token da fila infixa\n");
-            freePilha(&pilha_operadores);
-            freeFila(fila_saida);
-            return NULL;
+            break;
         }
         removeFromFila(fila_infixa);
+        putOnFila(&fila_temp, token);
+    }
+
+    // Restaurar fila original e processar
+    while (!isFilaVazia(fila_temp)) {
+        Token* token;
+        if (!getFromFila(fila_temp, (ElementoDeFila*)&token)) {
+            printf("Erro ao obter token da fila temporária\n");
+            break;
+        }
+        removeFromFila(&fila_temp);
+        
+        // Restaurar na fila original
+        putOnFila(fila_infixa, token);
 
         if (token->tipo == TOKEN_NUMERO) {
             // Números vão direto para a fila de saída
             if (!putOnFila(fila_saida, token)) {
                 printf("Erro ao colocar número na fila de saída\n");
-                free(token);
                 freePilha(&pilha_operadores);
+                freeFila(&fila_temp);
                 freeFila(fila_saida);
+                free(fila_saida);
                 return NULL;
             }
         }
@@ -69,9 +98,10 @@ Fila* infixa_para_posfixa(Fila* fila_infixa) {
                 // Parêntese aberto vai para a pilha
                 if (!putOnPilha(&pilha_operadores, token)) {
                     printf("Erro ao empilhar parêntese aberto\n");
-                    free(token);
                     freePilha(&pilha_operadores);
+                    freeFila(&fila_temp);
                     freeFila(fila_saida);
+                    free(fila_saida);
                     return NULL;
                 }
             }
@@ -95,9 +125,10 @@ Fila* infixa_para_posfixa(Fila* fila_infixa) {
                         // Move operador para fila de saída
                         if (!putOnFila(fila_saida, topo)) {
                             printf("Erro ao mover operador para fila de saída\n");
-                            free(token);
                             freePilha(&pilha_operadores);
+                            freeFila(&fila_temp);
                             freeFila(fila_saida);
+                            free(fila_saida);
                             return NULL;
                         }
                         removeFromPilha(&pilha_operadores);
@@ -106,9 +137,12 @@ Fila* infixa_para_posfixa(Fila* fila_infixa) {
 
                 if (!encontrou_aberto) {
                     printf("Erro: Parênteses desbalanceados\n");
+                    free(token->valor);
                     free(token);
                     freePilha(&pilha_operadores);
+                    freeFila(&fila_temp);
                     freeFila(fila_saida);
+                    free(fila_saida);
                     return NULL;
                 }
                 free(token->valor);
@@ -127,13 +161,17 @@ Fila* infixa_para_posfixa(Fila* fila_infixa) {
 
                 // Se o topo não for parêntese e deve desempilhar
                 if (strcmp(topo->valor, "(") != 0 && 
+                    e_operador(topo->valor[0]) && 
                     deve_desempilhar(topo->valor[0], operador_atual)) {
                     
                     if (!putOnFila(fila_saida, topo)) {
                         printf("Erro ao mover operador para fila de saída\n");
+                        free(token->valor);
                         free(token);
                         freePilha(&pilha_operadores);
+                        freeFila(&fila_temp);
                         freeFila(fila_saida);
+                        free(fila_saida);
                         return NULL;
                     }
                     removeFromPilha(&pilha_operadores);
@@ -146,9 +184,12 @@ Fila* infixa_para_posfixa(Fila* fila_infixa) {
             // Empilha o operador atual
             if (!putOnPilha(&pilha_operadores, token)) {
                 printf("Erro ao empilhar operador\n");
+                free(token->valor);
                 free(token);
                 freePilha(&pilha_operadores);
+                freeFila(&fila_temp);
                 freeFila(fila_saida);
+                free(fila_saida);
                 return NULL;
             }
         }
@@ -164,20 +205,25 @@ Fila* infixa_para_posfixa(Fila* fila_infixa) {
         if (strcmp(topo->valor, "(") == 0) {
             printf("Erro: Parênteses desbalanceados\n");
             freePilha(&pilha_operadores);
+            freeFila(&fila_temp);
             freeFila(fila_saida);
+            free(fila_saida);
             return NULL;
         }
 
         if (!putOnFila(fila_saida, topo)) {
             printf("Erro ao mover operador final para fila de saída\n");
             freePilha(&pilha_operadores);
+            freeFila(&fila_temp);
             freeFila(fila_saida);
+            free(fila_saida);
             return NULL;
         }
         removeFromPilha(&pilha_operadores);
     }
 
     freePilha(&pilha_operadores);
+    freeFila(&fila_temp);
     return fila_saida;
 }
 
@@ -259,7 +305,6 @@ int main() {
             continue;
         }
         
-        // ETAPA 3: Conversão para pós-fixa
         Fila* fila_posfixa = infixa_para_posfixa(&fila_tokens);
         if (fila_posfixa == NULL) {
             printf("Erro na conversão para notação pós-fixa\n");
@@ -267,13 +312,10 @@ int main() {
             continue;
         }
         
-        // ETAPA 4: Cálculo da expressão pós-fixa
         double resultado = calcular_posfixa(fila_posfixa);
         
-        // Exibir resultado
         printf("Resultado: %.2f\n\n", resultado);
         
-        // Limpeza das estruturas
         freeFila(&fila_tokens);
         freeFila(fila_posfixa);
         free(fila_posfixa);
