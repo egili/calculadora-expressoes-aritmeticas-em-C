@@ -1,4 +1,4 @@
-#include "ui.h"
+#include "interface.h"
 #include <stdio.h>
 #include <string.h>
 
