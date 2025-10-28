@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 
-boolean removerEspacos(char* str) {
+boolean removeGaps(char* str) {
     if (str == NULL) {
         return false;
     }
