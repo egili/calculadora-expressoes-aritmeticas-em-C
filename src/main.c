@@ -8,8 +8,8 @@
 #include "calculatePostfix.h"
 #include "removerEspacos.h"
 #include "breakExpressionTokens.h"
-#include "conversorInfixaParaPosfixa.h"
-#include "ui.h"
+#include "infixaParaPosfixa.h"
+#include "interface.h"
 
 int main() {
     exibir_cabecalho();
