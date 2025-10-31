@@ -8,37 +8,47 @@ boolean removeGaps(char* str) {
         return false;
     }
 
-    char* stringAuxiliar               = str;
-    boolean isNumeroAtualmente         = false; 
-    boolean ultimoCaracterLidoEhDigito = false; 
-    
-    while (*stringAuxiliar != '\0') {
-        if (*stringAuxiliar == ' ') {
-            if (isNumeroAtualmente && isdigit(*(stringAuxiliar + 1)) && *(stringAuxiliar + 1) != '\0') { //* isDigit serve para validar se o caractere é um dígito decimal 0-9
-                return false;
-            }
-        } else if (isdigit(*stringAuxiliar)) {
-            if (!isNumeroAtualmente && ultimoCaracterLidoEhDigito) {
-                return false; 
-            }
-            isNumeroAtualmente = true;
-            ultimoCaracterLidoEhDigito = true;
-        } else {
-            isNumeroAtualmente = false;
-            ultimoCaracterLidoEhDigito = false;
-            
-            if (!strchr("+-*/().", *stringAuxiliar)) {
-                return false; 
-            }
+    char* ponteiroLeitura = str;
+    while (*ponteiroLeitura != '\0') {
+        if (!isspace(*ponteiroLeitura) && 
+            !isdigit(*ponteiroLeitura) && 
+            !strchr("+-*/().^", *ponteiroLeitura)) {  
+            printf("Erro: Caractere inválido '%c'\n", *ponteiroLeitura);
+            return false;
         }
-        stringAuxiliar++;
+        ponteiroLeitura++;
     }
 
-    char* ponteiroLeitura = str;
+    ponteiroLeitura = str;
+    boolean emNumero = false;
+    boolean espacoEncontrado = false;
+    
+    while (*ponteiroLeitura != '\0') {
+        if (isdigit(*ponteiroLeitura)) {
+            if (espacoEncontrado && emNumero) {
+                printf("Erro: Espaço entre dígitos não permitido\n");
+                return false;
+            }
+            emNumero = true;
+            espacoEncontrado = false;
+        } 
+        else if (isspace(*ponteiroLeitura)) {
+            if (emNumero) {
+                espacoEncontrado = true;
+            }
+        } 
+        else {
+            emNumero = false;
+            espacoEncontrado = false;
+        }
+        ponteiroLeitura++;
+    }
+
+    ponteiroLeitura = str;
     char* ponteiroEscrita = str;
 
     while (*ponteiroLeitura != '\0') {
-        if (*ponteiroLeitura != ' ') {
+        if (!isspace(*ponteiroLeitura)) {
             *ponteiroEscrita = *ponteiroLeitura;
             ponteiroEscrita++;
         }
